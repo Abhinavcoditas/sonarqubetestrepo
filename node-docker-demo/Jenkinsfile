@@ -1,0 +1,58 @@
+def buildNumber = BUILD_NUMBER as int; if (buildNumber > 1) milestone(buildNumber - 1); milestone(buildNumber)
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+          - name: docker
+            image: public.ecr.aws/d7h0j7s7/gitlab-ci:latestv2argocd
+            tty: true
+            volumeMounts:
+             - mountPath: /var/run/docker.sock
+               name: docker-sock
+          - name: sonarqube
+            image: sonarsource/sonar-scanner-cli:latest
+            command: ['/bin/bash']
+            tty: true
+            volumeMounts:
+             - mountPath: /var/run/docker.sock
+               name: docker-sock
+          volumes:
+          - name: docker-sock
+            hostPath:
+              path: /var/run/docker.sock    
+        '''
+    }
+  }
+  stages {
+    stage('SonarQube main Build') {
+      when {
+         beforeInput true
+         branch 'main'
+      }
+
+      steps {
+        container('sonarqube')
+        {
+            sh '''
+                sonar-scanner -D sonar.projectKey=sonartest -D sonar.sources=. -D sonar.host.url=http://localhost:52755 -D sonar.token=sqp_2ad737d762ff37c7638504840a7b8f5b6cf189d4
+            '''
+        }
+          }
+        }
+      }
+    }
+  }
+  
+    post{
+      always{
+          mail to: "${GIT_COMMIT_EMAIL}",cc: "abhinav.dadhich@coditas.com",
+          subject: "Your Pipeline Status For ${JOB_NAME}",
+          body: "Jenkins Build For Job ${env.JOB_NAME} is ${currentBuild.currentResult}:, You can Find More Info. at ${env.BUILD_URL}"
+      }
+    }
+ }
