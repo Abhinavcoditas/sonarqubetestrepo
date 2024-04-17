@@ -1,4 +1,6 @@
-def buildNumber = BUILD_NUMBER as int; if (buildNumber > 1) milestone(buildNumber - 1); milestone(buildNumber)
+def buildNumber = BUILD_NUMBER as int
+if (buildNumber > 1) milestone(buildNumber - 1)
+milestone(buildNumber)
 
 pipeline {
   agent {
@@ -12,18 +14,23 @@ pipeline {
             image: sonarsource/sonar-scanner-cli:latest
             command: ['/bin/bash']
             tty: true
-        '''
+      '''
     }
   }
   stages {
     stage('SonarQube main Build') {
-
       steps {
-        container('sonarqube')
-        {
-            sh '''
-                sonar-scanner -D sonar.projectKey=sonartest -D sonar.sources=. -D sonar.host.url=http://172.20.249.197:9000 -D sonar.token=sqp_2ad737d762ff37c7638504840a7b8f5b6cf189d4
-            '''
+        container('sonarqube') {
+          script {
+            def scannerOutput = sh (
+              script: 'sonar-scanner -D sonar.projectKey=sonartest -D sonar.sources=. -D sonar.host.url=http://172.20.249.197:9000 -D sonar.token=sqp_2ad737d762ff37c7638504840a7b8f5b6cf189d4',
+              returnStdout: true
+            ).trim()
+            
+            if (scannerOutput.contains('INFO: EXECUTION FAILED')) {
+              error "SonarQube scan execution failed"
+            }
+          }
         }
       }
     }
