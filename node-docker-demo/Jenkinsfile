@@ -27,6 +27,9 @@ pipeline {
               returnStdout: true
             ).trim()
             
+            echo "SonarQube Scanner Output:"
+            echo scannerOutput
+            
             if (scannerOutput.contains('INFO: EXECUTION FAILED')) {
               error "SonarQube scan execution failed"
             }
