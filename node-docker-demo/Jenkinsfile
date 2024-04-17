@@ -42,17 +42,15 @@ pipeline {
                 sonar-scanner -D sonar.projectKey=sonartest -D sonar.sources=. -D sonar.host.url=http://localhost:52755 -D sonar.token=sqp_2ad737d762ff37c7638504840a7b8f5b6cf189d4
             '''
         }
-          }
-        }
       }
     }
   }
-  
-    post{
-      always{
-          mail to: "${GIT_COMMIT_EMAIL}",cc: "abhinav.dadhich@coditas.com",
-          subject: "Your Pipeline Status For ${JOB_NAME}",
-          body: "Jenkins Build For Job ${env.JOB_NAME} is ${currentBuild.currentResult}:, You can Find More Info. at ${env.BUILD_URL}"
-      }
+
+  post {
+    always {
+      mail to: "${GIT_COMMIT_EMAIL}", cc: "abhinav.dadhich@coditas.com",
+      subject: "Your Pipeline Status For ${JOB_NAME}",
+      body: "Jenkins Build For Job ${env.JOB_NAME} is ${currentBuild.currentResult}:, You can Find More Info. at ${env.BUILD_URL}"
     }
- }
+  }
+}
