@@ -14,6 +14,10 @@ pipeline {
             image: sonarsource/sonar-scanner-cli:latest
             command: ['/bin/bash']
             tty: true
+          - name: trivy
+            image: aquasec/trivy
+            command: ['sleep']
+            args: ['infinity']
       '''
     }
   }
@@ -23,7 +27,7 @@ pipeline {
         container('sonarqube') {
           script {
             def scannerOutput = sh (
-              script: 'sonar-scanner -D sonar.projectKey=sonartest -D sonar.sources=. -D sonar.host.url=http://172.20.249.197:9000 -D sonar.token=sqp_2ad737d762ff37c7638504840a7b8f5b6cf189d4',
+              script: 'sonar-scanner -D sonar.projectKey=sonatrivy -D sonar.sources=. -D sonar.host.url=http://localhost:9000 -D sonar.token=sqp_90c406f394c2711e71ba4d3edc2352a12dbbde58',
               returnStdout: true
             ).trim()
             
