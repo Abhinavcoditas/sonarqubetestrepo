@@ -3,28 +3,10 @@ if (buildNumber > 1) milestone(buildNumber - 1)
 milestone(buildNumber)
 
 pipeline {
-  agent {
-    kubernetes {
-      yaml '''
-        apiVersion: v1
-        kind: Pod
-        spec:
-          containers:
-          - name: sonarqube
-            image: sonarsource/sonar-scanner-cli:latest
-            command: ['/bin/bash']
-            tty: true
-          - name: trivy
-            image: aquasec/trivy
-            command: ['sleep']
-            args: ['infinity']
-      '''
-    }
-  }
+  agent any
   stages {
     stage('SonarQube main Build') {
       steps {
-        container('sonarqube') {
           script {
             def scannerOutput = sh (
               script: 'sonar-scanner -D sonar.projectKey=sonatrivy -D sonar.sources=. -D sonar.host.url=http://localhost:9000 -D sonar.token=sqp_90c406f394c2711e71ba4d3edc2352a12dbbde58',
@@ -36,7 +18,6 @@ pipeline {
             
             if (scannerOutput.contains('INFO: EXECUTION FAILED')) {
               error "SonarQube scan execution failed"
-            }
           }
         }
       }
