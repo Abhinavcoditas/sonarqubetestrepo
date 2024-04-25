@@ -22,7 +22,7 @@ pipeline {
         }
       }
     }
-      stage('Image Build and push') {
+    stage('Image Build') {
       steps {
         sh '''
           aws configure set aws_access_key_id "AKIATQBXFCLVBOLHZBGE"; aws configure set aws_secret_access_key "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"; aws configure set default.region "ap-south-1"
@@ -31,5 +31,26 @@ pipeline {
           '''
       }
     }
+    stage('Trivy Scanning') {
+      steps {
+        sh '''
+          trivy image --format json --output result.json sonatrivytest:$CI_COMMIT_SHA
+        '''
+      }
+    }
+    stage('Image push') {
+      steps {
+        sh '''
+          docker push sonatrivytest:$CI_COMMIT_SHA
+        '''
+      }
+    }
+    //post{
+      //always{
+        //  mail to: "${GIT_COMMIT_EMAIL}",cc: "abhinav.dadhich@coditas.com",
+          //subject: "Your Pipeline Status For ${JOB_NAME}",
+          //body: "Jenkins Build For Job ${env.JOB_NAME} is ${currentBuild.currentResult}:, You can Find More Info. at ${env.BUILD_URL}"
+      //}
+    //}
   }
 }
