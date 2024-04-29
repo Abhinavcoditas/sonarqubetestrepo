@@ -36,6 +36,19 @@ pipeline {
         sh '''
           trivy image --format json --output result.json sonatrivytest:$CI_COMMIT_SHA
         '''
+        script {
+          def trivyResult = readFile 'result.json'
+          def json = new groovy.json.JsonSlurper().parseText(trivyResult)
+          
+          def lowCount = json.Vulnerabilities.findAll { it.Severity == 'LOW' }.size()
+          def mediumCount = json.Vulnerabilities.findAll { it.Severity == 'MEDIUM' }.size()
+          def highCount = json.Vulnerabilities.findAll { it.Severity == 'HIGH' }.size()
+          def criticalCount = json.Vulnerabilities.findAll { it.Severity == 'CRITICAL' }.size()
+          
+          if (lowCount > 5 || mediumCount > 3 || highCount > 0 || criticalCount > 0) {
+            error "Vulnerabilities found: Low - ${lowCount}, Medium - ${mediumCount}, High - ${highCount}, Critical - ${criticalCount}"
+          }
+        }
       }
     }
     stage('Image push') {
