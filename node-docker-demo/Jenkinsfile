@@ -85,7 +85,6 @@ pipeline {
           }
         }
       }
-    }
     stage('Manual Confirmation') {
       steps {
         script {
@@ -100,12 +99,6 @@ pipeline {
         '''
       }
     }
-    //post{
-      //always{
-        //  mail to: "${GIT_COMMIT_EMAIL}",cc: "abhinav.dadhich@coditas.com",
-          //subject: "Your Pipeline Status For ${JOB_NAME}",
-          //body: "Jenkins Build For Job ${env.JOB_NAME} is ${currentBuild.currentResult}:, You can Find More Info. at ${env.BUILD_URL}"
-      //}
-    //}
   }
-}
+  }
+
