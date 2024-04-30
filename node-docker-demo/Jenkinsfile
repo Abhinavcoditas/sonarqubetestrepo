@@ -41,7 +41,7 @@ pipeline {
     stage('Trivy Scanning') {
       steps {
         sh '''
-          trivy image --format json --output result.json sonatrivytest:$CI_COMMIT_SHA
+          trivy image --format json --output result.json sonatrivytest_$CI_COMMIT_SHA
         '''
         script {
           def trivyResult = readFile 'result.json'
