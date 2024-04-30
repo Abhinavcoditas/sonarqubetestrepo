@@ -61,6 +61,10 @@ pipeline {
         '''
       }
     }
+    post {
+    always {
+      echo "Total number of vulnerabilities: ${totalVulnerabilities}"
+    }
     //post{
       //always{
         //  mail to: "${GIT_COMMIT_EMAIL}",cc: "abhinav.dadhich@coditas.com",
