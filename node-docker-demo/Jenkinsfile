@@ -6,7 +6,7 @@ pipeline {
   agent any
   
   environment {
-    CI_COMMIT_SHA = "$GIT_BRANCH" + "_$GIT_COMMIT"
+    CI_COMMIT_SHA = "$GIT_COMMIT"
   }
 
   stages {
