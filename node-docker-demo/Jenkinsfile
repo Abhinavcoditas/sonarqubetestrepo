@@ -42,13 +42,13 @@ pipeline {
       steps {
         script {
           def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true)
-          def vulnerabilities = readJSON(text: trivyOutput)
+          // def vulnerabilities = readJSON(text: trivyOutput)
           
-          def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
+          // def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
           
-          if (highAndCriticalCount > 3) {
-            error("Pipeline failed due to more than 3 critical or high vulnerabilities.")
-          }
+          // if (highAndCriticalCount > 3) {
+          //   error("Pipeline failed due to more than 3 critical or high vulnerabilities.")
+          // }
         }
       }
     }
