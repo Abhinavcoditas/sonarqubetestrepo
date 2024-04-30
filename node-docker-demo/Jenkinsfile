@@ -44,23 +44,16 @@ pipeline {
           def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true).trim()
           echo "Trivy Output:"
           echo trivyOutput
-          // Parse Trivy output to categorize vulnerabilities
-                    def jsonSlurper = new groovy.json.JsonSlurper()
-                    def vulnerabilities = jsonSlurper.parseText(trivyOutput)
-                    
-                    // Initialize counters for each severity
+          // Count vulnerabilities by severity using jq
                     def severityCounts = [:].withDefault { 0 }
-                    
-                    // Count vulnerabilities by severity
-                    vulnerabilities.each { vuln ->
-                        def severity = vuln.Severity?.toUpperCase() // Make sure to handle null values
-                        severityCounts[severity]++
+                    sh(script: 'echo \'' + trivyOutput + '\' | jq \'.[] | .Severity\'', 
+                       returnStdout: true).split().each { severity ->
+                        severityCounts[severity.toUpperCase()]++
                     }
                     
                     // Print counts of vulnerabilities by severity
                     severityCounts.each { severity, count ->
                         echo "${severity ?: 'Unknown'} Severity: ${count}"
-                    }
           }
         }
       }
