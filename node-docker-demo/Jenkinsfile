@@ -45,43 +45,43 @@ pipeline {
           echo "Trivy Output:"
           echo trivyOutput
           // Parse Trivy output to categorize vulnerabilities
-                        def jsonSlurper = new groovy.json.JsonSlurper()
-                        def vulnerabilities = jsonSlurper.parseText(trivyOutput)
-                        
-                        // Initialize counters for each severity
-                        def lowCount = 0
-                        def mediumCount = 0
-                        def highCount = 0
-                        def criticalCount = 0
-                        
-                        // Count vulnerabilities by severity
-                        vulnerabilities.each { vuln ->
-                            def severity = vuln.Severity.toUpperCase()
-                            switch (severity) {
-                                case 'LOW':
-                                    lowCount++
-                                    break
-                                case 'MEDIUM':
-                                    mediumCount++
-                                    break
-                                case 'HIGH':
-                                    highCount++
-                                    break
-                                case 'CRITICAL':
-                                    criticalCount++
-                                    break
-                                default:
-                                    // Handle unknown severity
-                                    break
-                            }
+                    def jsonSlurper = new groovy.json.JsonSlurper()
+                    def vulnerabilities = jsonSlurper.parseText(trivyOutput)
+                    
+                    // Initialize counters for each severity
+                    def lowCount = 0
+                    def mediumCount = 0
+                    def highCount = 0
+                    def criticalCount = 0
+                    
+                    // Count vulnerabilities by severity
+                    vulnerabilities.each { vuln ->
+                        def severity = vuln.Severity?.toUpperCase() // Make sure to handle null values
+                        switch (severity) {
+                            case 'LOW':
+                                lowCount++
+                                break
+                            case 'MEDIUM':
+                                mediumCount++
+                                break
+                            case 'HIGH':
+                                highCount++
+                                break
+                            case 'CRITICAL':
+                                criticalCount++
+                                break
+                            default:
+                                // Handle unknown severity
+                                break
                         }
-                        
-                        // Print counts of vulnerabilities by severity
-                        echo "Total number of vulnerabilities found: ${vulnerabilities.size()}"
-                        echo "Low Severity: ${lowCount}"
-                        echo "Medium Severity: ${mediumCount}"
-                        echo "High Severity: ${highCount}"
-                        echo "Critical Severity: ${criticalCount}"
+                    }
+                    
+                    // Print counts of vulnerabilities by severity
+                    echo "Total number of vulnerabilities found: ${vulnerabilities.size()}"
+                    echo "Low Severity: ${lowCount}"
+                    echo "Medium Severity: ${mediumCount}"
+                    echo "High Severity: ${highCount}"
+                    echo "Critical Severity: ${criticalCount}"
           }
         }
       }
