@@ -41,22 +41,21 @@ pipeline {
     stage('Trivy Scanning') {
       steps {
         script {
-          def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true).trim()
-          echo "Trivy Output:"
-          echo trivyOutput
-          // Count vulnerabilities by severity using jq
-                    def severityCounts = [:].withDefault { 0 }
-                    sh(script: 'echo \'' + trivyOutput + '\' | jq \'.[] | .Severity\'', 
-                       returnStdout: true).split().each { severity ->
-                        severityCounts[severity.toUpperCase()]++
-                    }
-                    
-                    // Print counts of vulnerabilities by severity
-                    severityCounts.each { severity, count ->
-                        echo "${severity ?: 'Unknown'} Severity: ${count}"
+          trivy image --format json --output result.json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
+          // Parse the JSON output to extract the vulnerabilities array
+          try {
+            data = json.loads(trivyOutput)
+            vulnerabilities = data.get("Vulnerabilities", [])
+            numVulnerabilities = len(vulnerabilities)
+    
+            // Print the number of vulnerabilities found
+            println("Number of vulnerabilities found: ${numVulnerabilities}")
+          } catch (e) {
+            println("Error: Failed to parse trivy scan output (assuming JSON format): ${e}")
           }
         }
       }
+    }
     // stage('Manual Confirmation') {
     //   steps {
     //     script {
@@ -71,7 +70,6 @@ pipeline {
     //     '''
     //   }
     // }
-  }
   }
 }
 
