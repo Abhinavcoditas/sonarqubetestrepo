@@ -4,6 +4,11 @@ milestone(buildNumber)
 
 pipeline {
   agent any
+  
+  environment {
+    CI_COMMIT_SHA = "$GIT_BRANCH" + "_$GIT_COMMIT"
+  }
+
   stages {
     stage('SonarQube main Build') {
       steps {
