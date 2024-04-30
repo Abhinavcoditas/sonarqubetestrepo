@@ -5,17 +5,17 @@ FROM node:9
 WORKDIR /src
 
 # Install packages using NPM 5 (bundled with the node:9 image)
-COPY ./package.json /src/package.json
-COPY ./package-lock.json /src/package-lock.json
+COPY node-docker-demo/package.json /src/package.json
+COPY node-docker-demo/package-lock.json /src/package-lock.json
 RUN npm install --silent
 
 # Add application code
-COPY ./app /src/app
-COPY ./bin /src/bin
-COPY ./public /src/public
+COPY node-docker-demo/app /src/app
+COPY node-docker-demo/bin /src/bin
+COPY node-docker-demo/public /src/public
 
 # Add the nodemon configuration file
-COPY ./nodemon.json /src/nodemon.json
+COPY node-docker-demo/nodemon.json /src/nodemon.json
 
 # Set environment to "development" by default
 ENV NODE_ENV development
