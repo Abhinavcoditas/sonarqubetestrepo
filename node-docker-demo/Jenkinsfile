@@ -85,20 +85,20 @@ pipeline {
           }
         }
       }
-    stage('Manual Confirmation') {
-      steps {
-        script {
-          input(message: 'Do you want to proceed with pushing the image to ECR?', submitter: 'user')
-        }
-      }
-    }
-    stage('Image push') {
-      steps {
-        sh '''
-          docker push "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
-        '''
-      }
-    }
+    // stage('Manual Confirmation') {
+    //   steps {
+    //     script {
+    //       input(message: 'Do you want to proceed with pushing the image to ECR?', submitter: 'user')
+    //     }
+    //   }
+    // }
+    // stage('Image push') {
+    //   steps {
+    //     sh '''
+    //       docker push "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
+    //     '''
+    //   }
+    // }
   }
   }
 
