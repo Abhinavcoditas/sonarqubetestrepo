@@ -31,7 +31,7 @@ pipeline {
       steps {
         sh '''
           aws configure set aws_access_key_id "AKIATQBXFCLVBOLHZBGE"; aws configure set aws_secret_access_key "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"; aws configure set default.region "ap-south-1"
-          docker build -t sonatrivytest:$CI_COMMIT_SHA -f sonatrivytest/Dockerfile .
+          docker build -t sonatrivytest:$CI_COMMIT_SHA -f node-docker-demo/Dockerfile .
           
           '''
       }
