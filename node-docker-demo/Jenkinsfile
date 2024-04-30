@@ -44,8 +44,8 @@ pipeline {
           def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true)
           echo "Trivy Output:"
           echo trivyOutput
-          def vulnerabilities = readJSON(text: trivyOutput)
-          totalVulnerabilities += vulnerabilities.Vulnerabilities.size()
+          // def vulnerabilities = readJSON(text: trivyOutput)
+          // totalVulnerabilities += vulnerabilities.Vulnerabilities.size()
           //def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
           
           // if (highAndCriticalCount > 3) {
@@ -69,9 +69,9 @@ pipeline {
       //}
     //}
   }
-  post {
-    always {
-      echo "Total number of vulnerabilities: ${totalVulnerabilities}"
-    }
-    }
+  // post {
+  //   always {
+  //     echo "Total number of vulnerabilities: ${totalVulnerabilities}"
+  //   }
+  //   }
 }
