@@ -38,21 +38,21 @@ pipeline {
           '''
       }
     }
-    // stage('Trivy Scanning') {
-    //   steps {
-    //     script {
-    //       def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true)
-    //       echo "Trivy Output:"
-    //       echo trivyOutput
-    //       def vulnerabilities = readJSON(text: trivyOutput)
-    //       def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
+    stage('Trivy Scanning') {
+      steps {
+        script {
+          def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true)
+          echo "Trivy Output:"
+          echo trivyOutput
+          def vulnerabilities = readJSON(text: trivyOutput)
+          def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
           
-    //       if (highAndCriticalCount > 3) {
-    //         error("Pipeline failed due to more than 3 critical or high vulnerabilities. Please review and address them.")
-    //       }
-    //     }
-    //   }
-    // }
+          if (highAndCriticalCount > 5000) {
+            error("Pipeline failed due to more than 3 critical or high vulnerabilities. Please review and address them.")
+          }
+        }
+      }
+    }
     stage('Manual Confirmation') {
       steps {
         script {
@@ -75,9 +75,4 @@ pipeline {
       //}
     //}
   }
-  // post {
-  //   always {
-  //     echo "Total number of vulnerabilities: ${totalVulnerabilities}"
-  //   }
-  //   }
 }
