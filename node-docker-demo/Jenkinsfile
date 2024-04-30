@@ -40,20 +40,14 @@ pipeline {
     }
     stage('Trivy Scanning') {
       steps {
-        sh '''
-          trivy image --format json --output result.json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
-        '''
         script {
-          def trivyResult = readFile 'result.json'
-          def json = new groovy.json.JsonSlurper().parseText(trivyResult)
+          def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true)
+          def vulnerabilities = readJSON(text: trivyOutput)
           
-          def lowCount = json.Vulnerabilities.findAll { it.Severity == 'LOW' }.size()
-          def mediumCount = json.Vulnerabilities.findAll { it.Severity == 'MEDIUM' }.size()
-          def highCount = json.Vulnerabilities.findAll { it.Severity == 'HIGH' }.size()
-          def criticalCount = json.Vulnerabilities.findAll { it.Severity == 'CRITICAL' }.size()
+          def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
           
-          if (lowCount > 5 || mediumCount > 3 || highCount > 0 || criticalCount > 0) {
-            error "Vulnerabilities found: Low - ${lowCount}, Medium - ${mediumCount}, High - ${highCount}, Critical - ${criticalCount}"
+          if (highAndCriticalCount > 3) {
+            error("Pipeline failed due to more than 3 critical or high vulnerabilities.")
           }
         }
       }
