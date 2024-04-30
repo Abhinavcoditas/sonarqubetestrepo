@@ -11,7 +11,7 @@ pipeline {
 
   stages {
     
-    /* stage('SonarQube main Build') {
+     stage('SonarQube main Build') {
       steps {
           script {
             def scannerOutput = sh (
@@ -27,7 +27,7 @@ pipeline {
           }
         }
       }
-    } */
+    } 
     
     stage('Image Build') {
       steps {
