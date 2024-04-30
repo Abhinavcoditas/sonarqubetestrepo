@@ -40,44 +40,40 @@ pipeline {
     }
     stage('Trivy Scanning') {
       steps {
+          sh '''
+          trivy image --format json --output result.json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
+        '''
+        
+      //   script {
+      //     def trivyResult = readFile 'result.json'
+      //     def json = new groovy.json.JsonSlurper().parseText(trivyResult)
+          
+      //     def lowCount = json.Vulnerabilities.findAll { it.Severity == 'LOW' }.size()
+      //     def mediumCount = json.Vulnerabilities.findAll { it.Severity == 'MEDIUM' }.size()
+      //     def highCount = json.Vulnerabilities.findAll { it.Severity == 'HIGH' }.size()
+      //     def criticalCount = json.Vulnerabilities.findAll { it.Severity == 'CRITICAL' }.size()
+          
+      //     if (lowCount > 5 || mediumCount > 3 || highCount > 0 || criticalCount > 0) {
+      //       error "Vulnerabilities found: Low - ${lowCount}, Medium - ${mediumCount}, High - ${highCount}, Critical - ${criticalCount}"
+
+      //   }
+      // }
+    }
+    }
+    stage('Manual Confirmation') {
+      steps {
         script {
-          // Run Trivy image scan in JSON format and store the output in a file
-      sh 'trivy image --format json --output result.json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"'
-
-      // Parse the JSON file to extract the total number of vulnerabilities
-      def totalVulnerabilities = 0
-      try {
-        def jsonData = new JsonSlurper().parse(file('result.json'))
-        totalVulnerabilities = jsonData.Vulnerabilities.size()
-      } catch (Exception e) {
-        echo "Error parsing Trivy JSON output: ${e.message}"
-      }
-
-      // Use the totalVulnerabilities variable for decision making
-      if (totalVulnerabilities > 0) {
-        echo "Image contains ${totalVulnerabilities} vulnerabilities. Consider fixing them before deployment."
-        // You can potentially fail the stage here or trigger further actions based on your requirements.
-      } else {
-        echo 'Image scan found no vulnerabilities.'
-      }
-
+          input(message: 'Do you want to proceed with pushing the image to ECR?', submitter: 'user')
         }
       }
     }
-    // stage('Manual Confirmation') {
-    //   steps {
-    //     script {
-    //       input(message: 'Do you want to proceed with pushing the image to ECR?', submitter: 'user')
-    //     }
-    //   }
-    // }
-    // stage('Image push') {
-    //   steps {
-    //     sh '''
-    //       docker push "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
-    //     '''
-    //   }
-    // }
+    stage('Image push') {
+      steps {
+        sh '''
+          docker push "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
+        '''
+      }
+    }
   }
 }
 
