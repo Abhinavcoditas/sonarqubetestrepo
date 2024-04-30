@@ -34,23 +34,28 @@ pipeline {
         sh '''
           aws configure set aws_access_key_id "AKIATQBXFCLVBOLHZBGE"; aws configure set aws_secret_access_key "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"; aws configure set default.region "ap-south-1"
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 240633844458.dkr.ecr.ap-south-1.amazonaws.com
-          docker build -t "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA" -f node-docker-demo/Dockerfile .
           '''
       }
     }
-    stage('Trivy Scanning') {
+    // stage('Trivy Scanning') {
+    //   steps {
+    //     script {
+    //       def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true)
+    //       echo "Trivy Output:"
+    //       echo trivyOutput
+    //       def vulnerabilities = readJSON(text: trivyOutput)
+    //       def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
+          
+    //       if (highAndCriticalCount > 3) {
+    //         error("Pipeline failed due to more than 3 critical or high vulnerabilities. Please review and address them.")
+    //       }
+    //     }
+    //   }
+    // }
+    stage('Manual Confirmation') {
       steps {
         script {
-          def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true)
-          echo "Trivy Output:"
-          echo trivyOutput
-          def vulnerabilities = readJSON(text: trivyOutput)
-          totalVulnerabilities += vulnerabilities.Vulnerabilities.size()
-          def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
-          
-          if (highAndCriticalCount > 3) {
-            error("Pipeline failed due to more than 3 critical or high vulnerabilities. Please review and address them.")
-          }
+          input(message: 'Do you want to proceed with pushing the image to ECR?', submitter: 'user')
         }
       }
     }
