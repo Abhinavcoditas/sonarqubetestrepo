@@ -46,7 +46,7 @@ pipeline {
           echo trivyOutput
           def vulnerabilities = readJSON(text: trivyOutput)
           totalVulnerabilities += vulnerabilities.Vulnerabilities.size()
-          def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
+          //def highAndCriticalCount = vulnerabilities.Vulnerabilities.findAll { it.Severity in ['CRITICAL', 'HIGH'] }.size()
           
           // if (highAndCriticalCount > 3) {
           //   error("Pipeline failed due to more than 3 critical or high vulnerabilities.")
