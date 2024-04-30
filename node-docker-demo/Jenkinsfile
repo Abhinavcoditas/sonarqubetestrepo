@@ -34,14 +34,14 @@ pipeline {
         sh '''
           aws configure set aws_access_key_id "AKIATQBXFCLVBOLHZBGE"; aws configure set aws_secret_access_key "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"; aws configure set default.region "ap-south-1"
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 240633844458.dkr.ecr.ap-south-1.amazonaws.com
-          docker build -t 240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA -f node-docker-demo/Dockerfile .
+          docker build -t "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA" -f node-docker-demo/Dockerfile .
           '''
       }
     }
     stage('Trivy Scanning') {
       steps {
         sh '''
-          trivy image --format json --output result.json 240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA
+          trivy image --format json --output result.json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
         '''
         script {
           def trivyResult = readFile 'result.json'
@@ -61,7 +61,7 @@ pipeline {
     stage('Image push') {
       steps {
         sh '''
-          docker push 240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA
+          docker push "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
         '''
       }
     }
