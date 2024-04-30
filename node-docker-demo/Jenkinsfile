@@ -61,7 +61,7 @@ pipeline {
     stage('Image push') {
       steps {
         sh '''
-          docker push sonatrivytest:$CI_COMMIT_SHA
+          docker push sonatrivytest_$CI_COMMIT_SHA
         '''
       }
     }
