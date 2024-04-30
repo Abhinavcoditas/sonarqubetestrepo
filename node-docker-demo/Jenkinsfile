@@ -41,18 +41,26 @@ pipeline {
     stage('Trivy Scanning') {
       steps {
         script {
-          trivy image --format json --output result.json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
-          // Parse the JSON output to extract the vulnerabilities array
-          try {
-            data = json.loads(trivyOutput)
-            vulnerabilities = data.get("Vulnerabilities", [])
-            numVulnerabilities = len(vulnerabilities)
-    
-            // Print the number of vulnerabilities found
-            println("Number of vulnerabilities found: ${numVulnerabilities}")
-          } catch (e) {
-            println("Error: Failed to parse trivy scan output (assuming JSON format): ${e}")
-          }
+          // Run Trivy image scan in JSON format and store the output in a file
+      sh 'trivy image --format json --output result.json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"'
+
+      // Parse the JSON file to extract the total number of vulnerabilities
+      def totalVulnerabilities = 0
+      try {
+        def jsonData = new JsonSlurper().parse(file('result.json'))
+        totalVulnerabilities = jsonData.Vulnerabilities.size()
+      } catch (Exception e) {
+        echo "Error parsing Trivy JSON output: ${e.message}"
+      }
+
+      // Use the totalVulnerabilities variable for decision making
+      if (totalVulnerabilities > 0) {
+        echo "Image contains ${totalVulnerabilities} vulnerabilities. Consider fixing them before deployment."
+        // You can potentially fail the stage here or trigger further actions based on your requirements.
+      } else {
+        echo 'Image scan found no vulnerabilities.'
+      }
+
         }
       }
     }
