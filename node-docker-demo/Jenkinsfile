@@ -40,11 +40,11 @@ pipeline {
     }
     stage('Trivy Scanning') {
       steps {
-          sh '''
-          trivy image --format json --output result.json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
-        '''
         
-      //   script {
+        script {
+             def trivyOutput = sh(script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true)
+             echo "Trivy Output:"
+             echo trivyOutput
       //     def trivyResult = readFile 'result.json'
       //     def json = new groovy.json.JsonSlurper().parseText(trivyResult)
           
@@ -57,7 +57,7 @@ pipeline {
       //       error "Vulnerabilities found: Low - ${lowCount}, Medium - ${mediumCount}, High - ${highCount}, Critical - ${criticalCount}"
 
       //   }
-      // }
+       }
     }
     }
     stage('Manual Confirmation') {
