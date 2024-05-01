@@ -44,7 +44,8 @@ pipeline {
         sh '''
           trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
         '''
-    }
+    
+      }
     }
     stage('Manual Confirmation') {
       steps {
