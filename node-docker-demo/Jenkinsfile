@@ -47,7 +47,7 @@ pipeline {
                 returnStdout: true
             ).trim()
 
-            def criticalCountMatch = scanResult =~ /CRITICAL: (\d+)/
+            def criticalCountMatch = (scanResult =~ /CRITICAL: (\d+)/)
             if (criticalCountMatch) {
                 def criticalCount = criticalCountMatch[0][1] as Integer
                 if (criticalCount >= 200) {
