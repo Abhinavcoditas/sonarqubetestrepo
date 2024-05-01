@@ -49,18 +49,15 @@ pipeline {
 
             def vulnerabilities = new groovy.json.JsonSlurper().parseText(jsonOutput)
 
-            def highVulnerabilities = vulnerabilities.Vulnerabilities.findAll { it.Severity == "HIGH" }.size()
-            def criticalVulnerabilities = vulnerabilities.Vulnerabilities.findAll { it.Severity == "CRITICAL" }.size()
-            def mediumVulnerabilities = vulnerabilities.Vulnerabilities.findAll { it.Severity == "MEDIUM" }.size()
-            def lowVulnerabilities = vulnerabilities.Vulnerabilities.findAll { it.Severity == "LOW" }.size()
-
-            echo "Number of HIGH vulnerabilities: ${highVulnerabilities}"
-            echo "Number of CRITICAL vulnerabilities: ${criticalVulnerabilities}"
-            echo "Number of MEDIUM vulnerabilities: ${mediumVulnerabilities}"
-            echo "Number of LOW vulnerabilities: ${lowVulnerabilities}"
+            echo "Vulnerability Report:"
+            vulnerabilities.Vulnerabilities.each { vulnerability ->
+                echo "  - Package: ${vulnerability.PkgName}"
+                echo "    Version: ${vulnerability.InstalledVersion}"
+                echo "    Severity: ${vulnerability.Severity}"
+                echo "    Title: ${vulnerability.Title}"
+                echo "    Description: ${vulnerability.Description}"
+            }
         }
-
-    
       }
     }
     stage('Manual Confirmation') {
