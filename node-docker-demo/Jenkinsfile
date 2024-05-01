@@ -47,14 +47,13 @@ pipeline {
                 returnStdout: true
             ).trim()
 
-            def criticalCount = scanResult =~ /CRITICAL: (\d+)/
-            if (criticalCount) {
-                def criticalVulnerabilities = criticalCount[0][1] as Integer
-                if (criticalVulnerabilities >= 200) {
-                    currentBuild.result = 'FAILED'
+            def criticalCountMatch = scanResult =~ /CRITICAL: (\d+)/
+            if (criticalCountMatch) {
+                def criticalCount = criticalCountMatch[0][1] as Integer
+                if (criticalCount >= 200) {
                     error "Pipeline failed due to 200 or more CRITICAL vulnerabilities"
                 } else {
-                    echo "CRITICAL vulnerabilities count: $criticalVulnerabilities"
+                    echo "CRITICAL vulnerabilities count: $criticalCount"
                 }
             } else {
                 error "Failed to parse CRITICAL vulnerabilities count from Trivy scan result"
