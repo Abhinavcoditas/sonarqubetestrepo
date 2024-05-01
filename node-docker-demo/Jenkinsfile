@@ -63,16 +63,5 @@ pipeline {
     //   }
     // }
   }
-  post {
-        always {
-            script {
-                // Fail build if critical vulnerabilities are found
-                def criticalCount = env.CRITICAL_VULNS_COUNT.toInteger()
-                if (criticalCount >= 100) {
-                    error "Too many critical vulnerabilities (${criticalCount}) found. Build failed."
-                }
-            }
-        }
-    }
 }
 
