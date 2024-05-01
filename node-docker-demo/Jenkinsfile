@@ -48,7 +48,7 @@ pipeline {
             ).trim()
 
             def criticalCountMatch = scanResult =~ /CRITICAL: (\d+)/
-            if (criticalCountMatch) {
+            if (!criticalCountMatch.isEmpty()) {
                 def criticalCount = criticalCountMatch[0][1] as Integer
                 if (criticalCount >= 200) {
                     error "Pipeline failed due to 200 or more CRITICAL vulnerabilities"
