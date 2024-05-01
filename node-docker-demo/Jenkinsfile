@@ -41,10 +41,30 @@ pipeline {
     stage('Trivy Scanning') {
       steps {
 
-        sh '''
-          trivy image  "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA" > test.txt
-          cat test.txt
-        '''
+        script {
+            def output = sh(script: 'trivy image "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true).trim()
+
+            // Extract counts for each severity level
+            def criticalCount = output =~ /CRITICAL: (\d+)/
+            def highCount = output =~ /HIGH: (\d+)/
+            def mediumCount = output =~ /MEDIUM: (\d+)/
+            def lowCount = output =~ /LOW: (\d+)/
+            def unknownCount = output =~ /UNKNOWN: (\d+)/
+
+            // Convert match results to integers
+            def critical = criticalCount ? criticalCount[0][1] as Integer : 0
+            def high = highCount ? highCount[0][1] as Integer : 0
+            def medium = mediumCount ? mediumCount[0][1] as Integer : 0
+            def low = lowCount ? lowCount[0][1] as Integer : 0
+            def unknown = unknownCount ? unknownCount[0][1] as Integer : 0
+
+            // Check if critical count exceeds the threshold
+            if (critical >= 1000) {
+                error "Pipeline failed: Too many critical vulnerabilities (${critical})"
+            } else {
+                println "Pipeline continues: Critical: ${critical}, High: ${high}, Medium: ${medium}, Low: ${low}, Unknown: ${unknown}"
+            }
+        }
 
       }
     }
