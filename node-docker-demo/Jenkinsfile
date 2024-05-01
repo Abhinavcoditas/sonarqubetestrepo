@@ -41,16 +41,10 @@ pipeline {
     stage('Trivy Scanning') {
       steps {
 
-        script {
-                    // Execute Trivy scan on the Docker image
-                    TRIVY_EXIT_CODE = sh(returnStatus: true, script: 'trivy --format json 240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA || true').trim()
-                    if (TRIVY_EXIT_CODE == 0) {
-                        def trivyOutput = sh(script: 'trivy --format json 240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA', returnStdout: true).trim()
-                        def vulnerabilities = readJSON text: trivyOutput
-                        CRITICAL_VULNS_COUNT = vulnerabilities.findAll { it.Severity == 'CRITICAL' }.size()
-                    }
-                }
-
+        sh '''
+          trivy image  "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA" > test.txt
+          cat test.txt
+        '''
 
       }
     }
