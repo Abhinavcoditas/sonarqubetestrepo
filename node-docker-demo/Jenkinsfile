@@ -59,7 +59,7 @@ pipeline {
             def unknown = unknownCount ? unknownCount[0][1] as Integer : 0
 
             // Check if critical count exceeds the threshold
-            if (critical >= 1000) {
+            if (critical >= 100) {
                 error "Pipeline failed: Too many critical vulnerabilities (${critical})"
             } else {
                 println "Pipeline continues: Critical: ${critical}, High: ${high}, Medium: ${medium}, Low: ${low}, Unknown: ${unknown}"
