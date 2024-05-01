@@ -42,39 +42,41 @@ pipeline {
       steps {
 
         script {
-            def scanResult = sh(
-                script: 'trivy image "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"',
-                returnStdout: true
-            ).trim()
+                    // Execute Trivy scan on the Docker image
+                    TRIVY_EXIT_CODE = sh(returnStatus: true, script: 'trivy --severity CRITICAL --format json 240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA || true').trim()
+                    if (TRIVY_EXIT_CODE == 0) {
+                        def trivyOutput = sh(script: 'trivy --severity CRITICAL --format json 240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA', returnStdout: true).trim()
+                        def vulnerabilities = readJSON text: trivyOutput
+                        CRITICAL_VULNS_COUNT = vulnerabilities.size()
+                    }
+                }
 
-            def criticalCount = sh(
-                script: "echo '$scanResult' | grep -c 'CRITICAL'",
-                returnStdout: true
-            ).trim().toInteger()
-
-            if (criticalCount >= 2000) {
-                error "Pipeline failed due to 2000 or more CRITICAL vulnerabilities"
-            } else {
-                echo "CRITICAL vulnerabilities count: $criticalCount"
+      }
+    }
+    // stage('Manual Confirmation') {
+    //   steps {
+    //     script {
+    //       input(message: 'Do you want to proceed with pushing the image to ECR?', submitter: 'user')
+    //     }
+    //   }
+    // }
+    // stage('Image push') {
+    //   steps {
+    //     sh '''
+    //       docker push "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
+    //     '''
+    //   }
+    // }
+  }
+  post {
+        always {
+            script {
+                // Fail build if critical vulnerabilities are found
+                if (CRITICAL_VULNS_COUNT >= 1000) {
+                    error "Too many critical vulnerabilities (${CRITICAL_VULNS_COUNT}) found. Build failed."
+                }
             }
         }
-
-      }
     }
-    stage('Manual Confirmation') {
-      steps {
-        script {
-          input(message: 'Do you want to proceed with pushing the image to ECR?', submitter: 'user')
-        }
-      }
-    }
-    stage('Image push') {
-      steps {
-        sh '''
-          docker push "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
-        '''
-      }
-    }
-  }
 }
 
