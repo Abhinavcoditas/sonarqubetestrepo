@@ -41,9 +41,24 @@ pipeline {
     stage('Trivy Scanning') {
       steps {
 
-        sh '''
-          trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA" | jq '.[].Vulnerabilities | length'
-        '''
+        script {
+            def jsonOutput = sh (
+                script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"',
+                returnStdout: true
+            ).trim()
+
+            def vulnerabilities = readJSON text: jsonOutput
+
+            def highVulnerabilities = vulnerabilities.findAll { it.Severity == "HIGH" }.size()
+            def criticalVulnerabilities = vulnerabilities.findAll { it.Severity == "CRITICAL" }.size()
+            def mediumVulnerabilities = vulnerabilities.findAll { it.Severity == "MEDIUM" }.size()
+            def lowVulnerabilities = vulnerabilities.findAll { it.Severity == "LOW" }.size()
+
+            echo "Number of HIGH vulnerabilities: ${highVulnerabilities}"
+            echo "Number of CRITICAL vulnerabilities: ${criticalVulnerabilities}"
+            echo "Number of MEDIUM vulnerabilities: ${mediumVulnerabilities}"
+            echo "Number of LOW vulnerabilities: ${lowVulnerabilities}"
+        }
     
       }
     }
