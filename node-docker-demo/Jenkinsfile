@@ -41,23 +41,10 @@ pipeline {
     stage('Trivy Scanning') {
       steps {
 
-        script {
-            def jsonOutput = sh (
-                script: 'trivy image --format json "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"',
-                returnStdout: true
-            ).trim()
+        sh '''
+          trivy image  "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA
+        '''
 
-            def vulnerabilities = new groovy.json.JsonSlurper().parseText(jsonOutput)
-
-            echo "Vulnerability Report:"
-            vulnerabilities.Vulnerabilities.each { vulnerability ->
-                echo "  - Package: ${vulnerability.PkgName}"
-                echo "    Version: ${vulnerability.InstalledVersion}"
-                echo "    Severity: ${vulnerability.Severity}"
-                echo "    Title: ${vulnerability.Title}"
-                echo "    Description: ${vulnerability.Description}"
-            }
-        }
       }
     }
     stage('Manual Confirmation') {
