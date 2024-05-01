@@ -47,14 +47,10 @@ pipeline {
                 returnStdout: true
             ).trim()
 
-            def criticalCount = 0
-            def lines = scanResult.tokenize('\n')
-            lines.each { line ->
-                def criticalMatch = line =~ /CRITICAL: (\d+)/
-                if (criticalMatch) {
-                    criticalCount += criticalMatch[0][1].toInteger()
-                }
-            }
+            def criticalCount = sh(
+                script: "echo '$scanResult' | grep -c 'CRITICAL'",
+                returnStdout: true
+            ).trim().toInteger()
 
             if (criticalCount >= 200) {
                 error "Pipeline failed due to 200 or more CRITICAL vulnerabilities"
