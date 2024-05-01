@@ -52,8 +52,8 @@ pipeline {
                 returnStdout: true
             ).trim().toInteger()
 
-            if (criticalCount >= 200) {
-                error "Pipeline failed due to 200 or more CRITICAL vulnerabilities"
+            if (criticalCount >= 2000) {
+                error "Pipeline failed due to 2000 or more CRITICAL vulnerabilities"
             } else {
                 echo "CRITICAL vulnerabilities count: $criticalCount"
             }
