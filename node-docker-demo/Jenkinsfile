@@ -47,9 +47,12 @@ pipeline {
                 returnStdout: true
             ).trim()
 
-            def criticalCountMatch = (scanResult =~ /CRITICAL: (\d+)/)
+            def criticalCountMatch = scanResult.findAll(/CRITICAL: (\d+)/)
             if (criticalCountMatch) {
-                def criticalCount = criticalCountMatch[0][1] as Integer
+                def criticalCount = 0
+                criticalCountMatch.each { match ->
+                    criticalCount += match[1] as Integer
+                }
                 if (criticalCount >= 200) {
                     error "Pipeline failed due to 200 or more CRITICAL vulnerabilities"
                 } else {
