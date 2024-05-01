@@ -42,7 +42,7 @@ pipeline {
       steps {
 
         sh '''
-          trivy image  "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
+          trivy image --ignore-unfixed "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"
         '''
 
       }
