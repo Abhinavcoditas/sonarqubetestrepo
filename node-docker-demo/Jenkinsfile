@@ -15,23 +15,23 @@ pipeline {
 
   stages {
     
-    //  stage('SonarQube main Build') {
-    //   steps {
-    //       script {
-    //         def scannerOutput = sh (
-    //           script: 'sonar-scanner -D sonar.projectKey=sonatrivy -D sonar.sources=. -D sonar.host.url=http://192.168.3.132:9000 -D sonar.token=sqp_90c406f394c2711e71ba4d3edc2352a12dbbde58',
-    //           returnStdout: true
-    //         ).trim()
+     stage('SonarQube main Build') {
+      steps {
+          script {
+            def scannerOutput = sh (
+              script: 'sonar-scanner -D sonar.projectKey=sonatrivy -D sonar.sources=. -D sonar.host.url=http://192.168.3.132:9000 -D sonar.token=sqp_90c406f394c2711e71ba4d3edc2352a12dbbde58',
+              returnStdout: true
+            ).trim()
             
-    //         echo "SonarQube Scanner Output:"
-    //         echo scannerOutput
+            echo "SonarQube Scanner Output:"
+            echo scannerOutput
             
-    //         if (scannerOutput.contains('INFO: EXECUTION FAILED')) {
-    //           error "SonarQube scan execution failed"
-    //       }
-    //     }
-    //   }
-    // } 
+            if (scannerOutput.contains('INFO: EXECUTION FAILED')) {
+              error "SonarQube scan execution failed"
+          }
+        }
+      }
+    } 
     
     stage('Image Build') {
       steps {
