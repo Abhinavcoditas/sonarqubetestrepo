@@ -44,6 +44,12 @@ pipeline {
         script {
             def output = sh(script: 'trivy image "240633844458.dkr.ecr.ap-south-1.amazonaws.com/sonatrivytest:$CI_COMMIT_SHA"', returnStdout: true).trim()
 
+            // Print the exact report
+            println "Vulnerability Report:"
+            println "---------------------"
+            println output
+            println "---------------------"
+
             // Extract counts for each severity level
             def criticalCount = output =~ /CRITICAL: (\d+)/
             def highCount = output =~ /HIGH: (\d+)/
@@ -58,15 +64,6 @@ pipeline {
             def low = lowCount ? lowCount[0][1] as Integer : 0
             def unknown = unknownCount ? unknownCount[0][1] as Integer : 0
 
-            // Print the report
-            println "Vulnerability Report:"
-            println "---------------------"
-            println "CRITICAL: ${critical}"
-            println "HIGH: ${high}"
-            println "MEDIUM: ${medium}"
-            println "LOW: ${low}"
-            println "UNKNOWN: ${unknown}"
-            println "---------------------"
 
             // Check if any severity level exceeds the threshold
             if (critical >= 1000 || high >= 1000 || medium >= 3000 || low >= 5000) {
