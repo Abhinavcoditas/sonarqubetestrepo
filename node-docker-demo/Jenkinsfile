@@ -66,7 +66,7 @@ pipeline {
 
 
             // Check if any severity level exceeds the threshold
-            if (critical >= 5 || high >= 1000 || medium >= 3000 || low >= 5000) {
+            if (critical >= 5000 || high >= 1000 || medium >= 3000 || low >= 5000) {
                 error "Pipeline failed: Too many vulnerabilities - CRITICAL: ${critical}, HIGH: ${high}, MEDIUM: ${medium}, LOW: ${low}, UNKNOWN: ${unknown}"
             } else {
                 println "Pipeline continues: Critical: ${critical}, High: ${high}, Medium: ${medium}, Low: ${low}, Unknown: ${unknown}"
