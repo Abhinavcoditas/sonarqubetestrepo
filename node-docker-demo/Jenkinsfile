@@ -7,8 +7,9 @@ pipeline {
   
   environment {
     CI_COMMIT_SHA = "$GIT_COMMIT"
-    ACCESSKEY = "$ACCESSKEY"
+    ACCESSKEY = credentials('ACCESSKEY')
     SECRETKEY = "$SECRETKEY"
+    
     
   }
 
